@@ -1,13 +1,13 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date
 
 class FlightBase(BaseModel):
-    departure_date: datetime.date
+    departure_date: date
     departure_airport_code: str
     departure_airport_name: str
     departure_city: str
     departure_locale: str
-    arrival_date: datetime.date
+    arrival_date: date
     arrival_airport_code: str
     arrival_airport_name: str
     arrival_city: str
