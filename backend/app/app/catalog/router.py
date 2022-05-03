@@ -30,5 +30,37 @@ async def search_catalog(departureAirportCode:Optional[str]=None, arrivalAirport
 async def create_flight(flight_in: schema.FlightCreate, db_session: Session = Depends(db.get_db)) -> Any:
     flight = await services.create_flight(flight_in, db_session)
     return flight
+
+@api_router.put("/catalog/{flight_id}")
+async def update_flight_by_id(flight_id:int, flight_in: schema.FlightUpdate, db_session: Session = Depends(db.get_db)) -> Any:
+    flight= await services.get_flight_by_id(flight_id, db_session)
+    if not flight:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid flight ID")
     
+    await services.update_flight_by_id(flight_id, flight_in, db_session)
+
+    return await services.get_flight_by_id(flight_id, db_session)
+
+@api_router.delete("/catalog/{flight_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_flight_by_id(flight_id:int, db_session: Session = Depends(db.get_db)):
+    flight= await services.get_flight_by_id(flight_id, db_session)
+    if not flight:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid flight ID")
+    
+    return await services.delete_flight_by_id(flight_id, db_session)
+
+@api_router.get("/catalog/{airportCode}", response_model=List[schema.Flight])
+async def search_airport_depart(airportCode: str, departureDate: str, db_session: Session = Depends(db.get_db)):
+    probDate = None
+    try:
+        probDate = datetime.strptime(departureDate, '%Y-%m-%d').date()
+    except:
+        raise HTTPException(status_code=400, detail="Invalid date. Date must be year-month-day. E.g. 1997-08-16")
+    
+    flights = await services.search_airport_depart(airportCode, probDate, db_session)
+    if not flights:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No flights found")
+    return flights
+
+
 
