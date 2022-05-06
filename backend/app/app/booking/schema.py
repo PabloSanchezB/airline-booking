@@ -10,10 +10,8 @@ class BookingStatus(str, Enum):
 
 class BookingBase(BaseModel):
     status: BookingStatus
-    outbound_flight_id: int
     payment_token: str
     checked_in: bool
-    customer_id: int
     created_at: str
     booking_reference: str
 
@@ -25,7 +23,9 @@ class BookingUpdate(BookingBase):
 
 class BookingInDBBase(BookingBase):
     id: int
+    outbound_flight_id: int
     outbound_flight: Flight
+    customer_id: int
     customer: User
 
     class Config:
