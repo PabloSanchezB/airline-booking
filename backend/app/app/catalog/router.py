@@ -4,9 +4,8 @@ from typing import Any, List, Optional
 from app.database import db
 from . import schema
 from . import services
-#from . import validation
-#from app.core import security #Para importar la seguridad
-#from app.user import schema as user_schema
+from app.core import security 
+from app.user import schema as user_schema
 from datetime import datetime, date
 
 api_router = APIRouter(tags=["Catalog"])
@@ -27,12 +26,15 @@ async def search_catalog(departureAirportCode:Optional[str]=None, arrivalAirport
     return flights
 
 @api_router.post("/catalog/", status_code=status.HTTP_201_CREATED)
-async def create_flight(flight_in: schema.FlightCreate, db_session: Session = Depends(db.get_db)) -> Any:
+async def create_flight(flight_in: schema.FlightCreate, db_session: Session = Depends(db.get_db),
+                        current_user: user_schema.User = Depends(security.get_current_user)) -> Any:
     flight = await services.create_flight(flight_in, db_session)
     return flight
 
 @api_router.put("/catalog/{flight_id}")
-async def update_flight_by_id(flight_id:int, flight_in: schema.FlightUpdate, db_session: Session = Depends(db.get_db)) -> Any:
+async def update_flight_by_id(flight_id:int, flight_in: schema.FlightUpdate, 
+                              db_session: Session = Depends(db.get_db),
+                              current_user: user_schema.User = Depends(security.get_current_user)) -> Any:
     flight= await services.get_flight_by_id(flight_id, db_session)
     if not flight:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid flight ID")
@@ -42,7 +44,8 @@ async def update_flight_by_id(flight_id:int, flight_in: schema.FlightUpdate, db_
     return await services.get_flight_by_id(flight_id, db_session)
 
 @api_router.delete("/catalog/{flight_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_flight_by_id(flight_id:int, db_session: Session = Depends(db.get_db)):
+async def delete_flight_by_id(flight_id:int, db_session: Session = Depends(db.get_db),
+                              current_user: user_schema.User = Depends(security.get_current_user)):
     flight= await services.get_flight_by_id(flight_id, db_session)
     if not flight:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid flight ID")

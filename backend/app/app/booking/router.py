@@ -5,6 +5,8 @@ from app.database import db
 from . import schema
 from . import services
 from . import validator
+from app.core import security 
+from app.user import schema as user_schema
 
 api_router = APIRouter(tags=["Booking"])
 
@@ -26,7 +28,8 @@ async def search_bookings(status:Optional[schema.BookingStatus]=None, customerNa
 
 @api_router.post("/booking/flight/{flight_id}/user/{user_id}", status_code=status.HTTP_201_CREATED)
 async def create_booking(flight_id:int, user_id:int, booking_in: schema.BookingCreate, 
-                         db_session: Session = Depends(db.get_db)):
+                         db_session: Session = Depends(db.get_db),
+                         current_user: user_schema.User = Depends(security.get_current_user)):
     flight = await validator.verify_flight_exist(flight_id, db_session)
     if not flight:
         raise HTTPException(status_code=404, detail="You have provided invalid flight id.")
@@ -39,7 +42,8 @@ async def create_booking(flight_id:int, user_id:int, booking_in: schema.BookingC
     return booking
 
 @api_router.delete("/booking/{booking_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_booking_by_id(booking_id:int, db_session: Session = Depends(db.get_db)):
+async def delete_booking_by_id(booking_id:int, db_session: Session = Depends(db.get_db),
+                               current_user: user_schema.User = Depends(security.get_current_user)):
     booking= await services.get_booking_by_id(booking_id, db_session)
     if not booking:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid booking ID")

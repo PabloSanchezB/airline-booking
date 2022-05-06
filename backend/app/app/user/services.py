@@ -34,5 +34,16 @@ async def delete_user_by_id(user_id: int, db_session: Session):
     db_session.query(models.User).filter(models.User.id == user_id).delete()
     db_session.commit()
 
+def authenticate(*, email:str, password:str, db: Session) -> Optional[models.User]:
+    user = db.query(models.User).filter(models.User.email == email).first()
+
+    if not user:
+        return None
+
+    if not hashing.verify_password(password, user.password):
+        return None
+
+    return user
+
 
 

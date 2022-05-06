@@ -9,14 +9,16 @@ async def get_booking_by_id(booking_id:int, db_session:Session) -> models.Bookin
     return booking
 
 
-def get_user_ids_by_name(customerName:str, db_session: Session) -> List[int]:
-    users = db_session.query(User).filter(User.name == customerName).all()
-    return [user.id for user in users]
+#def get_user_ids_by_name(customerName:str, db_session: Session) -> List[int]:
+ #   users = db_session.query(User).filter(User.name == customerName).all()
+  #  return [user.id for user in users]
 
 async def search_bookings(status:Optional[schema.BookingStatus], customerName:Optional[str], 
                           db_session: Session) -> List[models.Booking]:
     if customerName:
-        ids = get_user_ids_by_name(customerName, db_session)
+        users = db_session.query(User).filter(User.name == customerName).all()
+        #ids = get_user_ids_by_name(customerName, db_session)
+        ids = [user.id for user in users]
         if ids and status:
             return db_session.query(models.Booking).filter(models.Booking.customer_id.in_(ids),
                                                            models.Booking.status == status.value).all()
