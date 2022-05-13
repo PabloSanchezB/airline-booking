@@ -6,7 +6,7 @@ services:
     image: postgres:alpine
     restart: always
     environment:
-      - POSTGRES_USER=admin
+      - POSTGRES_USER=airadmin
       - POSTGRES_DB=airlinedb
       - POSTGRES_PASSWORD=123123
     ports:
@@ -21,6 +21,6 @@ services:
     ports:
       - 80:80
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://admin:123123@airline-db/airlinedb
+      - SQLALCHEMY_DATABASE_URI=postgresql://airadmin:123123@airline-db/airlinedb
     depends_on:
       - airline-db

@@ -5,9 +5,9 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     APP_ENV: str = 'dev'
-    DATABASE_USERNAME: str = 'admin'
+    DATABASE_USERNAME: str = 'airadmin'
     DATABASE_PASSWORD: str = '123123'
-    DATABASE_HOST: str = 'localhost'
+    DATABASE_HOST: str = 'airline-az-db.postgres.database.azure.com'
     DATABASE_NAME: str = 'airlinedb'
     TEST_DATABASE_NAME: str = 'airlinedb'
     DATABASE_PARAM: str = "sslmode=require"
